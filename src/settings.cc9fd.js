@@ -23,12 +23,12 @@ window._CCSettings = {
     hasStartSceneBundle: false,
     remoteBundles: [],
     subpackages: [],
-    launchScene: "db://assets/0.fire",
+    launchScene: "db://assets/3.fire",
     orientation: "portrait",
     debug: true,
     jsList: [],
     bundleVers: {
         internal: "cb4f5",
-        main: "6682e"
+        main: "a06c2"
     }
 };
