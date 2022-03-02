@@ -1255,6 +1255,7 @@ window.__require = function e(t, n, r) {
         var _this = null !== _super && _super.apply(this, arguments) || this;
         _this.text = "hello";
         _this.nodePos = new cc.Vec2(0, 0);
+        _this.moveMode = false;
         _this.storeMode = false;
         return _this;
       }
@@ -1271,11 +1272,14 @@ window.__require = function e(t, n, r) {
       };
       TouchArea.prototype.onTouchMove = function(event) {
         var diff = event.getLocation().sub(event.getStartLocation());
-        if (diff.mag() < 5) {
-          cc.log("onTouchMove \u79fb\u52d5\u8ddd\u96e2\u904e\u77ed");
-          return;
+        if (!this.moveMode) {
+          if (diff.mag() < 20) {
+            cc.log("onTouchMove \u79fb\u52d5\u8ddd\u96e2\u904e\u77ed");
+            return;
+          }
+          this.selected = false;
+          this.moveMode = true;
         }
-        this.selected = false;
         cc.log("onTouchMove");
         var self = this;
         var touches = event.getTouches();
@@ -1306,6 +1310,7 @@ window.__require = function e(t, n, r) {
         this.touchEnd(event);
       };
       TouchArea.prototype.touchEnd = function(event) {
+        this.moveMode = false;
         if (this.selected) {
           this.selected = false;
           var touches = event.getTouches();
