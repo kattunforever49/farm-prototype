@@ -4,6 +4,7 @@
         "02delMVqdBD70a/HSD99FK",
         "03bXdRIQJC1IvvLbgpayD4",
         "033A+ukltN7LEJ1rCap/6s",
+        "0eYM8krAFL/7MfLc1JvRuW",
         "12q7jOLt1K5Kh4tmIPKfKf",
         "17ohQDzApCa44AVN6MFigG",
         "19WJDbR/xEQ7AhHzdZ7I+F",
@@ -70,7 +71,8 @@
     "scenes": {
         "db://assets/0.fire": "64LNev1kRHr6++/kDkzq5H",
         "db://assets/1.fire": "602ZcBJqZLl61IaQNyCpmv",
-        "db://assets/2.fire": "c0FKHjdOZF3pP81NZismgW"
+        "db://assets/2.fire": "c0FKHjdOZF3pP81NZismgW",
+        "db://assets/3.fire": "0eYM8krAFL/7MfLc1JvRuW"
     },
     "redirect": [
         "02delMVqdBD70a/HSD99FK",
@@ -165,6 +167,8 @@
             "9e4ec",
             "0e00ec275",
             "5060c",
+            "0eYM8krAFL/7MfLc1JvRuW",
+            "58204",
             "30ri37WjFLi7S1ifYYJm2s",
             "fa0d5",
             "602ZcBJqZLl61IaQNyCpmv",

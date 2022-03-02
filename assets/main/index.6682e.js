@@ -1378,6 +1378,68 @@ window.__require = function e(t, n, r) {
   }, {
     "./TileTest": "TileTest"
   } ],
+  TouchDebug: [ function(require, module, exports) {
+    "use strict";
+    cc._RF.push(module, "735f8nxt/JJpLxhhXJIX2Ux", "TouchDebug");
+    "use strict";
+    var __extends = this && this.__extends || function() {
+      var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || {
+          __proto__: []
+        } instanceof Array && function(d, b) {
+          d.__proto__ = b;
+        } || function(d, b) {
+          for (var p in b) Object.prototype.hasOwnProperty.call(b, p) && (d[p] = b[p]);
+        };
+        return extendStatics(d, b);
+      };
+      return function(d, b) {
+        extendStatics(d, b);
+        function __() {
+          this.constructor = d;
+        }
+        d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, new __());
+      };
+    }();
+    var __decorate = this && this.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : null === desc ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) r = Reflect.decorate(decorators, target, key, desc); else for (var i = decorators.length - 1; i >= 0; i--) (d = decorators[i]) && (r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r);
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports, "__esModule", {
+      value: true
+    });
+    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    var TouchDebug = function(_super) {
+      __extends(TouchDebug, _super);
+      function TouchDebug() {
+        var _this = null !== _super && _super.apply(this, arguments) || this;
+        _this.label = null;
+        _this.text = "hello";
+        return _this;
+      }
+      TouchDebug.prototype.start = function() {
+        this.node.on(cc.Node.EventType.TOUCH_START, function() {
+          return cc.log("start");
+        }, this);
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, function() {
+          return cc.log("move");
+        }, this);
+        this.node.on(cc.Node.EventType.TOUCH_END, function() {
+          return cc.log("end");
+        }, this);
+        this.node.on(cc.Node.EventType.TOUCH_CANCEL, function() {
+          return cc.log("cancel");
+        }, this);
+      };
+      __decorate([ property(cc.Label) ], TouchDebug.prototype, "label", void 0);
+      __decorate([ property ], TouchDebug.prototype, "text", void 0);
+      TouchDebug = __decorate([ ccclass ], TouchDebug);
+      return TouchDebug;
+    }(cc.Component);
+    exports.default = TouchDebug;
+    cc._RF.pop();
+  }, {} ],
   TouchEvent: [ function(require, module, exports) {
     "use strict";
     cc._RF.push(module, "1a65fq6OVRDHYxkxJeMOZEZ", "TouchEvent");
@@ -1818,4 +1880,4 @@ window.__require = function e(t, n, r) {
     exports.default = NewClass;
     cc._RF.pop();
   }, {} ]
-}, {}, [ "BottomDragPanel", "ButtonAnimation", "CameraController", "Dirt", "EventNode", "GrowingTimeDisplayer", "Main", "Map", "ObserverPattern", "PlayerData", "PlayerInfoPanel", "Seed", "Singleton", "StoreItemBuyPanel", "StoreItemData", "StoreItemSlot", "StorePanel", "TestTileMap", "TileTest", "TouchArea", "TouchEvent", "TouchManager", "TouchSystem", "Touchable", "TouchableGroup", "UIButton", "UIController", "Vegetable" ]);
+}, {}, [ "BottomDragPanel", "ButtonAnimation", "CameraController", "Dirt", "EventNode", "GrowingTimeDisplayer", "Main", "Map", "ObserverPattern", "PlayerData", "PlayerInfoPanel", "Seed", "Singleton", "StoreItemBuyPanel", "StoreItemData", "StoreItemSlot", "StorePanel", "TestTileMap", "TileTest", "TouchArea", "TouchDebug", "TouchEvent", "TouchManager", "TouchSystem", "Touchable", "TouchableGroup", "UIButton", "UIController", "Vegetable" ]);
