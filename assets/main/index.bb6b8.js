@@ -1265,6 +1265,7 @@ window.__require = function e(t, n, r) {
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this);
       };
       TouchArea.prototype.onTouchStart = function(event) {
+        console.log("onTouchStart");
         if (this.storeMode) {
           cc.log("that");
           if (this.onTouchStartInStoreMode) {
@@ -1298,10 +1299,12 @@ window.__require = function e(t, n, r) {
         self.gameCam.node.setPosition(nPos);
       };
       TouchArea.prototype.onTouchEnd = function(event) {
+        console.log("onTouchEnd");
         this.nodePos = this.gameCam.node.getPosition();
         this.touchEnd(event);
       };
       TouchArea.prototype.onTouchCancel = function(event) {
+        console.log("onTouchCancel");
         this.nodePos = this.gameCam.node.getPosition();
         this.touchEnd(event);
       };
