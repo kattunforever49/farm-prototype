@@ -1266,16 +1266,8 @@ window.__require = function e(t, n, r) {
       };
       TouchArea.prototype.onTouchStart = function(event) {
         console.log("onTouchStart");
-        if (this.storeMode) {
-          cc.log("that");
-          if (this.onTouchStartInStoreMode) {
-            cc.log("this");
-            this.onTouchStartInStoreMode();
-          }
-        } else {
-          this.selected = true;
-          this.tileTest.touchStart(event);
-        }
+        this.selected = true;
+        this.tileTest.touchStart(event);
       };
       TouchArea.prototype.onTouchMove = function(event) {
         this.selected = false;
