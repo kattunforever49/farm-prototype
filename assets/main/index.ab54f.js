@@ -1270,6 +1270,11 @@ window.__require = function e(t, n, r) {
         this.tileTest.touchStart(event);
       };
       TouchArea.prototype.onTouchMove = function(event) {
+        var diff = event.getLocation().sub(event.getStartLocation());
+        if (diff.mag() < 5) {
+          cc.log("onTouchMove \u79fb\u52d5\u8ddd\u96e2\u904e\u77ed");
+          return;
+        }
         this.selected = false;
         cc.log("onTouchMove");
         var self = this;
