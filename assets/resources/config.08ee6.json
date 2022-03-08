@@ -1,0 +1,112 @@
+{
+    "paths": {
+        "32M528GclD/4q7SwmBX5rT": [
+            "ItemDatabase",
+            "cc.TextAsset"
+        ],
+        "6aOlSzVNtFoJf6CKKQMFiH": [
+            "Items/it_fa_00001",
+            "cc.SpriteFrame",
+            1
+        ],
+        "cabKzmwNxG6KlSYwPZLBwF": [
+            "Items/it_fa_00001",
+            "cc.Texture2D"
+        ],
+        "3b0Lf4/PpGQJELTC1NE1Sj": [
+            "itemDatabase2",
+            "cc.JsonAsset"
+        ],
+        "beZ9EWTlJECLBiOB+8HuWT": [
+            "prefabs/Vegetable",
+            "cc.Prefab"
+        ]
+    },
+    "uuids": [
+        "132F/ky2FNBpHzdj7X+kiB",
+        "17ohQDzApCa44AVN6MFigG",
+        "28dPjdQWxEQIG3VVl1Qm6T",
+        "32M528GclD/4q7SwmBX5rT",
+        "3b0Lf4/PpGQJELTC1NE1Sj",
+        "456iIJ3txKpp/WC9CUsr8I",
+        "47LfXTNedBhJ5sf0G+5l7j",
+        "4eeymbqLlM15aJUfAU7CHa",
+        "52nY9xms5GzIZRXdKHBf81",
+        "6aOlSzVNtFoJf6CKKQMFiH",
+        "6fCNnv3qBK05kcAKUdvDND",
+        "7cwLqPxuRCNI0IAhD/DH/s",
+        "986kuEIEpLKLlEJhvfWn6f",
+        "b2aHrECZ5APKGS/0d2hvT1",
+        "beZ9EWTlJECLBiOB+8HuWT",
+        "cabKzmwNxG6KlSYwPZLBwF",
+        "d0qC05vt5GxLaYyB/w3t//",
+        "ecpdLyjvZBwrvm+cedCcQy",
+        "f5XINqt0BGn7SkpmX6joeX"
+    ],
+    "scenes": {},
+    "redirect": [
+        "28dPjdQWxEQIG3VVl1Qm6T",
+        0,
+        "ecpdLyjvZBwrvm+cedCcQy",
+        0
+    ],
+    "deps": [
+        "internal"
+    ],
+    "packs": {
+        "03e786386": [
+            "4eeymbqLlM15aJUfAU7CHa",
+            "52nY9xms5GzIZRXdKHBf81",
+            "7cwLqPxuRCNI0IAhD/DH/s",
+            "cabKzmwNxG6KlSYwPZLBwF",
+            "d0qC05vt5GxLaYyB/w3t//",
+            "f5XINqt0BGn7SkpmX6joeX"
+        ],
+        "0c17c27b8": [
+            "132F/ky2FNBpHzdj7X+kiB",
+            "17ohQDzApCa44AVN6MFigG",
+            "456iIJ3txKpp/WC9CUsr8I",
+            "47LfXTNedBhJ5sf0G+5l7j",
+            "6fCNnv3qBK05kcAKUdvDND",
+            "986kuEIEpLKLlEJhvfWn6f",
+            "b2aHrECZ5APKGS/0d2hvT1",
+            "beZ9EWTlJECLBiOB+8HuWT"
+        ]
+    },
+    "name": "resources",
+    "importBase": "import",
+    "nativeBase": "native",
+    "debug": true,
+    "isZip": false,
+    "encrypted": false,
+    "versions": {
+        "import": [
+            "03e786386",
+            "6e003",
+            "0c17c27b8",
+            "dbdc3",
+            "32M528GclD/4q7SwmBX5rT",
+            "dbd35",
+            "3b0Lf4/PpGQJELTC1NE1Sj",
+            "531c9",
+            "6aOlSzVNtFoJf6CKKQMFiH",
+            "7288c"
+        ],
+        "native": [
+            "4eeymbqLlM15aJUfAU7CHa",
+            "f17e8",
+            "52nY9xms5GzIZRXdKHBf81",
+            "571ee",
+            "7cwLqPxuRCNI0IAhD/DH/s",
+            "c48a3",
+            "b2aHrECZ5APKGS/0d2hvT1",
+            "2bf0b",
+            "cabKzmwNxG6KlSYwPZLBwF",
+            "2834d",
+            "d0qC05vt5GxLaYyB/w3t//",
+            "841f5",
+            "f5XINqt0BGn7SkpmX6joeX",
+            "509dd"
+        ]
+    }
+}

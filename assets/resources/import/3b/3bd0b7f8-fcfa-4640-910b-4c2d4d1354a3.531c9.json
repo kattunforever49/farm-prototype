@@ -1,0 +1,70 @@
+[
+  1,
+  0,
+  0,
+  [
+    [
+      "cc.JsonAsset",
+      [
+        "_name",
+        "json"
+      ],
+      1
+    ]
+  ],
+  [
+    [
+      0,
+      0,
+      1,
+      3
+    ]
+  ],
+  [
+    [
+      0,
+      "itemDatabase2",
+      {
+        "items": [
+          {
+            "uid": 0,
+            "name": "绿豆",
+            "iconSprite": "it_fa_00001",
+            "tags": [
+              "seed"
+            ],
+            "growthSteps": [
+              0,
+              20,
+              70,
+              100
+            ]
+          },
+          {
+            "uid": 1,
+            "name": "椅子",
+            "iconSprite": "it_fa_00002",
+            "tags": [
+              "furniture"
+            ],
+            "directionSprite": [
+              "it_fa_00002",
+              "it_fa_00002",
+              "it_fa_00002",
+              "it_fa_00002"
+            ]
+          },
+          {
+            "uid": 2,
+            "name": "加速槍"
+          }
+        ]
+      }
+    ]
+  ],
+  0,
+  0,
+  [],
+  [],
+  []
+]
