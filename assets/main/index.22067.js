@@ -1127,6 +1127,7 @@ window.__require = function e(t, n, r) {
               this.InitTileTest();
               this.InitTouchArea();
               cc.log("\u521d\u59cb\u5316\u5168\u90e8\u5b8c\u6210");
+              this.blockUI.active = false;
               return [ 2 ];
             }
           });
@@ -1272,6 +1273,7 @@ window.__require = function e(t, n, r) {
       __decorate([ property(cc.Node) ], Main.prototype, "rootCanvasNode", void 0);
       __decorate([ property(cc.Node) ], Main.prototype, "bagpackUI", void 0);
       __decorate([ property(cc.Prefab) ], Main.prototype, "coinPrefab", void 0);
+      __decorate([ property(cc.Node) ], Main.prototype, "blockUI", void 0);
       Main = __decorate([ ccclass ], Main);
       return Main;
     }(cc.Component);
