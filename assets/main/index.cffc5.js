@@ -316,37 +316,56 @@ window.__require = function e(t, n, r) {
     var Dirt = function(_super) {
       __extends(Dirt, _super);
       function Dirt() {
-        var _this = null !== _super && _super.apply(this, arguments) || this;
-        _this.uiButton = null;
-        _this.subjects = null;
-        _this.isTouched = false;
-        return _this;
+        return null !== _super && _super.apply(this, arguments) || this;
       }
-      Dirt.prototype.start = function() {
-        var _this = this;
-        this.subjects.on("onTouchStart", function(x) {
-          return _this.onTouchStart(x);
-        });
-        this.subjects.on("onTouchEnd", function(x) {
-          return _this.onTouchEnd();
-        });
+      Dirt.prototype.setup = function(tile, nowTime, maxTime) {
+        this.tile = tile;
+        this.nowTime = nowTime;
+        this.maxTime = maxTime;
       };
-      Dirt.prototype.onTouchStart = function(event) {
-        var touchNode = event.node;
-        if (touchNode === this.node) {
-          console.log(this.node.name + " - " + touchNode.name);
-          this.uiButton.setPosition(this.node.position.x, this.node.position.y + 20, this.node.position.z);
-          this.uiButton.active = true;
-          this.uiButton.getComponent(cc.Animation).play();
-          this.isTouched = true;
+      Dirt.prototype.update = function(dt) {
+        this.veg && false == this.veg.canHarvest() && this.watering(-dt);
+      };
+      Dirt.prototype.watering = function(value) {
+        if (this.nowTime < this.maxTime) {
+          this.nowTime = this.nowTime += value;
+          this.nowTime > this.maxTime && (this.nowTime = this.maxTime);
+          this.updateSprite();
         }
       };
-      Dirt.prototype.onTouchEnd = function() {
-        this.isTouched = false;
-        this.uiButton.active = false;
+      Dirt.prototype.onPlant = function(veg) {
+        var _this = this;
+        this.veg = veg;
+        cc.log(this.veg);
+        this.veg.onCanHarvest = function() {
+          return _this.onCanHarvest();
+        };
+        this.veg.canGrowing = function() {
+          return _this.wateringRatio() > .35;
+        };
+        cc.log("\u7a2e\u690d\u4f5c\u7269");
       };
-      __decorate([ property(cc.Node) ], Dirt.prototype, "uiButton", void 0);
-      __decorate([ property(cc.Node) ], Dirt.prototype, "subjects", void 0);
+      Dirt.prototype.onCanHarvest = function() {
+        cc.log("\u719f\u6210");
+      };
+      Dirt.prototype.onHarvest = function() {
+        this.nowTime = .5 * this.maxTime;
+        this.veg = null;
+        this.updateSprite();
+      };
+      Dirt.prototype.updateSprite = function() {
+        var ratio = this.wateringRatio();
+        this.tile.gid = ratio > .8 ? 4 : ratio > .35 ? 3 : 2;
+      };
+      Dirt.prototype.canWatering = function() {
+        return null != this.veg;
+      };
+      Dirt.prototype.isNeedWatering = function() {
+        return this.wateringRatio() < .8;
+      };
+      Dirt.prototype.wateringRatio = function() {
+        return this.nowTime / this.maxTime;
+      };
       Dirt = __decorate([ ccclass ], Dirt);
       return Dirt;
     }(cc.Component);
@@ -384,13 +403,20 @@ window.__require = function e(t, n, r) {
     Object.defineProperty(exports, "__esModule", {
       value: true
     });
+    exports.DragType = void 0;
     var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    var DragType;
+    (function(DragType) {
+      DragType[DragType["item"] = 0] = "item";
+      DragType[DragType["Harvest"] = 1] = "Harvest";
+      DragType[DragType["Watering"] = 2] = "Watering";
+    })(DragType = exports.DragType || (exports.DragType = {}));
     var DragableObject = function(_super) {
       __extends(DragableObject, _super);
       function DragableObject() {
         var _this = null !== _super && _super.apply(this, arguments) || this;
         _this.moveMode = false;
-        _this.typeIndex = 0;
+        _this.typeIndex = DragType.item;
         _this.dragScale = 1.5;
         return _this;
       }
@@ -459,7 +485,7 @@ window.__require = function e(t, n, r) {
       __decorate([ property(cc.Sprite) ], DragableObject.prototype, "sprite", void 0);
       __decorate([ property(cc.Node) ], DragableObject.prototype, "valueDisplayer", void 0);
       __decorate([ property(cc.RichText) ], DragableObject.prototype, "valueTextDisplayer", void 0);
-      __decorate([ property(Number) ], DragableObject.prototype, "typeIndex", void 0);
+      __decorate([ property(typeof DragType) ], DragableObject.prototype, "typeIndex", void 0);
       __decorate([ property(Number) ], DragableObject.prototype, "dragScale", void 0);
       DragableObject = __decorate([ ccclass ], DragableObject);
       return DragableObject;
@@ -831,6 +857,7 @@ window.__require = function e(t, n, r) {
           }
         });
         this.playerItems = [ new IItemDatabase_1.PlayerItemDataSet("0", 3), new IItemDatabase_1.PlayerItemDataSet("1", 1), new IItemDatabase_1.PlayerItemDataSet("2", 2), new IItemDatabase_1.PlayerItemDataSet("3", 2) ];
+        cc.log("playerItems:" + this.playerItems);
         return new Promise(function(res, req) {
           return __awaiter(_this, void 0, void 0, function() {
             var _this = this;
@@ -1080,6 +1107,7 @@ window.__require = function e(t, n, r) {
     Object.defineProperty(exports, "__esModule", {
       value: true
     });
+    var Dirt_1 = require("./Dirt");
     var DragableObject_1 = require("./DragableObject");
     var Extentions_1 = require("./Extentions");
     var ItemDatabase2_1 = require("./ItemDatabase2");
@@ -1107,6 +1135,7 @@ window.__require = function e(t, n, r) {
           return __generator(this, function(_a) {
             switch (_a.label) {
              case 0:
+              this.blockUI.active = true;
               return [ 4, ItemDatabase2_1.ItemDatabase2.instance.init() ];
 
              case 1:
@@ -1122,6 +1151,7 @@ window.__require = function e(t, n, r) {
 
              case 2:
               _a.sent();
+              this.InitMap();
               this.InitPlayerData();
               this.InitSeedPanel();
               this.InitTileTest();
@@ -1139,6 +1169,27 @@ window.__require = function e(t, n, r) {
           this.coinPool.put(coin);
         }
       };
+      Main.prototype.InitMap = function() {
+        this.addDirt(22, 17);
+        this.addDirt(22, 18);
+        this.addDirt(22, 19);
+      };
+      Main.prototype.addDirt = function(x, y) {
+        var tile = this.getTileWithXY(x, y);
+        tile.gid = 3;
+        var dirt = tile.node.addComponent(Dirt_1.default);
+        dirt.setup(tile, 30, 60);
+      };
+      Main.prototype.getTileWithXY = function(x, y) {
+        var p = new cc.Vec2(11.54, 1400.45);
+        for (var w = 0; w < x; w++) p = p.add(new cc.Vec2(52, -26.5));
+        for (var h = 0; h < y; h++) p = p.add(new cc.Vec2(-52, -26.5));
+        var tile = this.tileTest.getTileByPosition(p);
+        return tile;
+      };
+      Main.prototype.setTileGID = function(x, y, gid) {
+        this.getTileWithXY(x, y).gid = gid;
+      };
       Main.prototype.InitTileTest = function() {
         var _this = this;
         this.tileTest.inject(this.itemDb);
@@ -1146,7 +1197,7 @@ window.__require = function e(t, n, r) {
           var inst = cc.instantiate(_this.vegetablePrefab);
           var veg = inst.getComponent(Vegetable_1.default);
           cc.log(veg);
-          veg.onSpawn(uid, 0, 10, _this.itemDb.getItemInfo(uid)["growthSteps"]);
+          veg.spawn(uid, 0, 10, _this.itemDb.getItemInfo(uid)["growthSteps"]);
           return inst;
         };
         this.tileTest.setupDragable = function(dragable, uid) {
@@ -1161,33 +1212,41 @@ window.__require = function e(t, n, r) {
           return _this.onStoreButtonTrigger();
         };
         this.touchArea.plant = function(tile, nodeToDrag, uid) {
-          var veg = tile.getComponentInChildren(Vegetable_1.default);
-          if (!veg) {
-            _this.tileTest.plantOnTile(uid, tile);
-            var item = _this.itemDb.playerItems.find(function(x) {
-              return x.uid == uid;
-            });
-            item.count = item.count - 1;
-            nodeToDrag.getComponent(DragableObject_1.default).updateValue();
-            _this.itemDb.playerItems = _this.itemDb.playerItems.filter(function(x) {
-              return x.count > 0;
-            });
-          }
+          return _this.plant(tile, nodeToDrag, uid);
         };
         this.touchArea.harvest = function(tile, nodeToDrag, uid) {
           var veg = tile.getComponentInChildren(Vegetable_1.default);
           var value = 5;
           veg.isFertilize && (value *= 2);
+          veg.harvest();
           veg.node.destroy();
           cc.log("**********\u6536\u6210" + value + "\u500b");
           _this.spawnCoin(value, tile.node.convertToWorldSpaceAR(new cc.Vec3(0, 0, 0)));
+          tile.getComponent(Dirt_1.default).onHarvest();
         };
         this.touchArea.spawnCoin = function(count, worldPos) {
           return _this.spawnCoin(count, worldPos);
         };
       };
+      Main.prototype.plant = function(tile, nodeToDrag, uid) {
+        var dirt = tile.getComponent(Dirt_1.default);
+        var veg = tile.getComponentInChildren(Vegetable_1.default);
+        if (!veg) {
+          this.tileTest.plantOnTile(uid, tile);
+          veg = tile.getComponentInChildren(Vegetable_1.default);
+          var item = this.itemDb.playerItems.find(function(x) {
+            return x.uid == uid;
+          });
+          item.count = item.count - 1;
+          nodeToDrag.getComponent(DragableObject_1.default).updateValue();
+          this.itemDb.playerItems = this.itemDb.playerItems.filter(function(x) {
+            return x.count > 0;
+          });
+          dirt.onPlant(veg);
+        }
+      };
       Main.prototype.InitPlayerData = function() {
-        this.playerData = new PlayerData_1.PlayerData("\u9f8d\u50b2", 6666, 7777, [ {
+        this.playerData = new PlayerData_1.PlayerData(5, 6666, 7777, [ {
           uid: "0",
           count: 10
         } ]);
@@ -1239,14 +1298,17 @@ window.__require = function e(t, n, r) {
       };
       Main.prototype.spawnCoin = function(count, worldPos) {
         var _this = this;
+        cc.log("spawnCoin:" + worldPos);
         var endPoint = this.bagpackUI.position;
         var _loop_1 = function() {
           var coin = null;
           coin = this_1.coinPool.size() > 0 ? this_1.coinPool.get() : cc.instantiate(this_1.coinPrefab);
           coin.parent = this_1.rootCanvasNode;
-          spawnPoint = this_1.rootCanvasNode.convertToNodeSpaceAR(worldPos);
-          spawnPoint.x += 2 * (Math.random() - .5) * 20;
-          spawnPoint.y += 2 * (Math.random() - .5) * 20;
+          p = this_1.gameCam.getWorldToScreenPoint(worldPos);
+          p2 = this_1.gameCam.node.parent.convertToWorldSpace(new cc.Vec2(p.x, p.y));
+          spawnPoint = this_1.rootCanvasNode.convertToNodeSpaceAR(p2);
+          spawnPoint.x += 2 * (Math.random() - .5) * 20 + 50;
+          spawnPoint.y += 2 * (Math.random() - .5) * 20 + 50;
           coin.setPosition(spawnPoint);
           coin.active = true;
           cc.tween(coin).delay(.3 * Math.random() + .2).to(.5, {
@@ -1255,7 +1317,7 @@ window.__require = function e(t, n, r) {
             return _this.recycleCoin(coin);
           }).start();
         };
-        var this_1 = this, spawnPoint;
+        var this_1 = this, p, p2, spawnPoint;
         for (var i = 0; i < count; i++) _loop_1();
       };
       Main.prototype.recycleCoin = function(coin) {
@@ -1274,12 +1336,15 @@ window.__require = function e(t, n, r) {
       __decorate([ property(cc.Node) ], Main.prototype, "bagpackUI", void 0);
       __decorate([ property(cc.Prefab) ], Main.prototype, "coinPrefab", void 0);
       __decorate([ property(cc.Node) ], Main.prototype, "blockUI", void 0);
+      __decorate([ property(cc.TiledMap) ], Main.prototype, "map", void 0);
+      __decorate([ property(cc.Camera) ], Main.prototype, "gameCam", void 0);
       Main = __decorate([ ccclass ], Main);
       return Main;
     }(cc.Component);
     exports.default = Main;
     cc._RF.pop();
   }, {
+    "./Dirt": "Dirt",
     "./DragableObject": "DragableObject",
     "./Extentions": "Extentions",
     "./ItemDatabase2": "ItemDatabase2",
@@ -1381,9 +1446,9 @@ window.__require = function e(t, n, r) {
     });
     exports.PlayerData = void 0;
     var PlayerData = function() {
-      function PlayerData(name, gem, catCoin, items) {
+      function PlayerData(lv, gem, catCoin, items) {
         this.observers = [];
-        this.name = name;
+        this.lv = lv;
         this.gem = gem;
         this.catCoin = catCoin;
         this.items = items;
@@ -1448,12 +1513,12 @@ window.__require = function e(t, n, r) {
         playerData.regist(this);
       };
       PlayerInfoPanel.prototype.updateData = function(data) {
-        this.nameDisplayer.string = data.name;
-        this.gemDisplayer.string = "\u7d05\u947d:" + data.gem;
-        this.catCoinDisplayer.string = "\u5c0f\u55b5\u5e63:" + data.catCoin;
+        this.lvDisplayer.string = "LV:" + data.lv.toString();
+        this.gemDisplayer.string = data.gem.toString();
+        this.catCoinDisplayer.string = data.catCoin.toString();
       };
       __decorate([ property(cc.Sprite) ], PlayerInfoPanel.prototype, "headDisplayer", void 0);
-      __decorate([ property(cc.RichText) ], PlayerInfoPanel.prototype, "nameDisplayer", void 0);
+      __decorate([ property(cc.RichText) ], PlayerInfoPanel.prototype, "lvDisplayer", void 0);
       __decorate([ property(cc.RichText) ], PlayerInfoPanel.prototype, "gemDisplayer", void 0);
       __decorate([ property(cc.RichText) ], PlayerInfoPanel.prototype, "catCoinDisplayer", void 0);
       PlayerInfoPanel = __decorate([ ccclass ], PlayerInfoPanel);
@@ -2106,10 +2171,12 @@ window.__require = function e(t, n, r) {
     Object.defineProperty(exports, "__esModule", {
       value: true
     });
+    exports.isDirt = void 0;
     var GrowingTimeDisplayer_1 = require("./GrowingTimeDisplayer");
     var SeedPanel_1 = require("./SeedPanel");
     var Vegetable_1 = require("./Vegetable");
     var DragableObject_1 = require("./DragableObject");
+    var Dirt_1 = require("./Dirt");
     var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
     var TileTest = function(_super) {
       __extends(TileTest, _super);
@@ -2126,7 +2193,16 @@ window.__require = function e(t, n, r) {
       TileTest.prototype.touchStart = function(event) {
         this.seedPanel.close();
         this.progressUI.getComponent(GrowingTimeDisplayer_1.default).close();
+        this.harvestUI.active = false;
+        this.wateringUI.active = false;
         this.lastSelectTile && (this.lastSelectTile.node.color = cc.Color.WHITE);
+      };
+      TileTest.prototype.onDrag = function(dragObject) {
+        this.progressUI.getComponent(GrowingTimeDisplayer_1.default).close();
+        if (dragObject.typeIndex == DragableObject_1.DragType.item) {
+          this.harvestUI.active = false;
+          this.wateringUI.active = false;
+        } else dragObject.typeIndex == DragableObject_1.DragType.Watering ? this.harvestUI.active = false : dragObject.typeIndex == DragableObject_1.DragType.Harvest && (this.wateringUI.active = false);
       };
       TileTest.prototype.touchEnd = function(vec2) {
         var _this = this;
@@ -2134,9 +2210,12 @@ window.__require = function e(t, n, r) {
         var pos = this.screenToMap(tiledLayer, this.node.convertToNodeSpaceAR(vec2));
         var tile = this.getTileByPosition(vec2);
         var tileNode = tile.node;
+        cc.log("x:" + tile.x + ", y:" + tile.y);
+        cc.log("\u8f49:" + tile.node.convertToWorldSpaceAR(new cc.Vec2(0, 0)));
         cc.log("gid:" + tile.gid);
         this.lastSelectTile = tile;
-        if (3 == tile.gid) {
+        if (isDirt(tile)) {
+          var dirt = tile.getComponent(Dirt_1.default);
           var veg = tile.getComponentInChildren(Vegetable_1.default);
           if (veg) if (veg.canHarvest()) {
             var wp = veg.node.convertToWorldSpaceAR(cc.v2(-70, 70));
@@ -2146,6 +2225,14 @@ window.__require = function e(t, n, r) {
             var dragable = this.harvestUI.getComponent(DragableObject_1.default);
             this.setupDragable(dragable, veg.uid);
           } else {
+            if (dirt.isNeedWatering()) {
+              var wp = veg.node.convertToWorldSpaceAR(cc.v2(-70, 70));
+              var sp = this.gameCamera.getWorldToScreenPoint(wp);
+              var lp = this.progressUI.parent.convertToNodeSpaceAR(sp);
+              this.wateringUI.setPosition(lp);
+              var dragable = this.wateringUI.getComponent(DragableObject_1.default);
+              this.setupDragable(dragable, veg.uid);
+            }
             var wp = veg.node.convertToWorldSpaceAR(cc.v2(0, 0));
             var sp = this.gameCamera.getWorldToScreenPoint(wp);
             var lp = this.progressUI.parent.convertToNodeSpaceAR(sp);
@@ -2164,9 +2251,11 @@ window.__require = function e(t, n, r) {
               item.count = item.count - 1;
               veg.SpeedUp(50);
             }, function() {
-              return _this.itemDB.playerItems.find(function(x) {
+              var item = _this.itemDB.playerItems.find(function(x) {
                 return "2" == x.uid;
-              }).count;
+              });
+              if (item) return item.count;
+              return 0;
             }, function() {
               cc.log("\u65bd\u80a5");
               var item = _this.itemDB.playerItems.find(function(x) {
@@ -2175,37 +2264,44 @@ window.__require = function e(t, n, r) {
               item.count = item.count - 1;
               veg.enableFertilize(true);
             }, function() {
-              return _this.itemDB.playerItems.find(function(x) {
+              var item = _this.itemDB.playerItems.find(function(x) {
                 return "3" == x.uid;
-              }).count;
+              });
+              if (item) return item.count;
+              return 0;
             }, function() {
               return _this.itemDB.playerItems.find(function(x) {
                 return "3" == x.uid;
               }).count > 0 && false == veg.isFertilize;
             });
           } else {
-            var wp = tile.node.convertToWorldSpaceAR(cc.v2(52, 26));
-            var sp = this.gameCamera.getWorldToScreenPoint(wp);
-            var winSize = cc.winSize;
-            if (sp.x > cc.winSize.width / 2) {
+            if (tile.gid > 2) {
               var wp = tile.node.convertToWorldSpaceAR(cc.v2(52, 26));
-              var sp = this.gameCamera.getWorldToScreenPoint(new cc.Vec2(wp.x - winSize.width / 3, wp.y));
-              var lp = this.seedPanel.node.parent.convertToNodeSpaceAR(sp);
-              cc.log("wp:" + wp + ", sp:" + sp, ", lp:" + lp);
-              this.seedPanel.node.setPosition(lp);
-              this.seedPanel.open();
-            } else {
-              var wp = tile.node.convertToWorldSpaceAR(cc.v2(52, 26));
-              var sp = this.gameCamera.getWorldToScreenPoint(new cc.Vec2(wp.x + winSize.width / 3, wp.y));
-              var lp = this.seedPanel.node.parent.convertToNodeSpaceAR(sp);
-              cc.log("w:" + cc.winSize.width + ", wp:" + wp + ", sp:" + sp, ", lp:" + lp);
-              this.seedPanel.node.setPosition(lp);
-              this.seedPanel.open();
+              var sp = this.gameCamera.getWorldToScreenPoint(wp);
+              var winSize = cc.winSize;
+              if (sp.x > cc.winSize.width / 2) {
+                var wp = tile.node.convertToWorldSpaceAR(cc.v2(52, 26));
+                var sp = this.gameCamera.getWorldToScreenPoint(new cc.Vec2(wp.x - winSize.width / 3, wp.y));
+                var lp = this.seedPanel.node.parent.convertToNodeSpaceAR(sp);
+                cc.log("wp:" + wp + ", sp:" + sp, ", lp:" + lp);
+                this.seedPanel.node.setPosition(lp);
+                this.seedPanel.open();
+              } else {
+                var wp = tile.node.convertToWorldSpaceAR(cc.v2(52, 26));
+                var sp = this.gameCamera.getWorldToScreenPoint(new cc.Vec2(wp.x + winSize.width / 3, wp.y));
+                var lp = this.seedPanel.node.parent.convertToNodeSpaceAR(sp);
+                cc.log("w:" + cc.winSize.width + ", wp:" + wp + ", sp:" + sp, ", lp:" + lp);
+                this.seedPanel.node.setPosition(lp);
+                this.seedPanel.open();
+              }
             }
             tile.node.color = cc.Color.RED;
           }
         }
         this.onTileClicked && this.onTileClicked(tile);
+      };
+      TileTest.prototype.isDirt = function(tile) {
+        return 2 == tile.gid || 3 == tile.gid || 4 == tile.gid;
       };
       TileTest.prototype.screenToMap = function(mapLayer, pos) {
         var tw = mapLayer.getMapTileSize().width;
@@ -2213,12 +2309,10 @@ window.__require = function e(t, n, r) {
         var self = this;
         var wx = pos.x - self.node.width / 2;
         var wy = pos.y - self.node.height + th;
-        console.log("w:" + self.node.width + ", h:" + self.node.height);
         var twh = tw / 2;
         var thh = th / 2;
         var x = Math.abs(Math.floor((wy / thh - wx / twh) / 2));
         var y = Math.abs(Math.floor((wx / twh + wy / thh) / 2));
-        cc.log("pos: " + x + ", " + y);
         return {
           x: x,
           y: y
@@ -2228,7 +2322,6 @@ window.__require = function e(t, n, r) {
         var tiledLayer = this.map.getLayer("base");
         var pos = this.screenToMap(tiledLayer, this.node.convertToNodeSpaceAR(p));
         var tile = tiledLayer.getTiledTileAt(pos.x, pos.y, true);
-        cc.log("gid:" + tile.gid);
         return tile;
       };
       TileTest.prototype.plantOnTile = function(uid, tile) {
@@ -2246,6 +2339,7 @@ window.__require = function e(t, n, r) {
       __decorate([ property(cc.Prefab) ], TileTest.prototype, "vegetablePrefab", void 0);
       __decorate([ property(cc.Node) ], TileTest.prototype, "progressUI", void 0);
       __decorate([ property(cc.Node) ], TileTest.prototype, "harvestUI", void 0);
+      __decorate([ property(cc.Node) ], TileTest.prototype, "wateringUI", void 0);
       __decorate([ property(cc.Camera) ], TileTest.prototype, "gameCamera", void 0);
       __decorate([ property(cc.Node) ], TileTest.prototype, "canvasNode", void 0);
       __decorate([ property(SeedPanel_1.default) ], TileTest.prototype, "seedPanel", void 0);
@@ -2253,8 +2347,13 @@ window.__require = function e(t, n, r) {
       return TileTest;
     }(cc.Component);
     exports.default = TileTest;
+    function isDirt(tile) {
+      return 2 == tile.gid || 3 == tile.gid || 4 == tile.gid;
+    }
+    exports.isDirt = isDirt;
     cc._RF.pop();
   }, {
+    "./Dirt": "Dirt",
     "./DragableObject": "DragableObject",
     "./GrowingTimeDisplayer": "GrowingTimeDisplayer",
     "./SeedPanel": "SeedPanel",
@@ -2291,6 +2390,7 @@ window.__require = function e(t, n, r) {
     Object.defineProperty(exports, "__esModule", {
       value: true
     });
+    var Dirt_1 = require("./Dirt");
     var DragableObject_1 = require("./DragableObject");
     var TileTest_1 = require("./TileTest");
     var Vegetable_1 = require("./Vegetable");
@@ -2320,19 +2420,19 @@ window.__require = function e(t, n, r) {
       TouchArea.prototype.onTouchMove = function(event) {
         var touches = event.getTouches();
         if (true === this.dragMode) {
-          cc.log("\u6293\u53d6\u66f4\u65b0");
           var s = this.gameCam.getScreenToWorldPoint(touches[0].getLocation());
           var tile = this.tileTest.getTileByPosition(new cc.Vec2(s.x, s.y));
-          if (3 == tile.gid) {
+          if (TileTest_1.isDirt(tile)) {
+            var dirt = tile.getComponent(Dirt_1.default);
             var veg = tile.getComponentInChildren(Vegetable_1.default);
             var drag = this.nodeToDrag.getComponent(DragableObject_1.default);
-            if (1 == drag.typeIndex) {
+            if (drag.typeIndex == DragableObject_1.DragType.Harvest) {
               if (veg && veg.canHarvest()) {
                 var uid = veg.uid;
                 cc.log("harvest => " + uid);
                 this.harvest(tile, this.nodeToDrag, uid);
               }
-            } else {
+            } else if (drag.typeIndex == DragableObject_1.DragType.Watering) dirt.watering(dirt.maxTime); else {
               var uid = this.nodeToDrag.getComponent(DragableObject_1.default).uid;
               cc.log("plant => " + uid);
               this.plant(tile, this.nodeToDrag, uid);
@@ -2359,10 +2459,6 @@ window.__require = function e(t, n, r) {
         var minY = -457;
         var maxY = 296;
         var nPos = self.gameCam.node.getPosition();
-        nPos.x < minX && (nPos.x = minX);
-        nPos.x > maxX && (nPos.x = maxX);
-        nPos.y < minY && (nPos.y = minY);
-        nPos.y > maxY && (nPos.y = maxY);
         self.gameCam.node.setPosition(nPos);
       };
       TouchArea.prototype.onTouchEnd = function(event) {
@@ -2440,10 +2536,8 @@ window.__require = function e(t, n, r) {
           this.node.setParent(this.dragLayer);
           this.dragMode = true;
           this.nodeToDrag = node;
-        } else if (eventType === cc.Node.EventType.TOUCH_MOVE) {
-          cc.log("\u6293\u53d6\u79fb\u52d5");
-          this.onTouchMove(event);
-        } else if (eventType === cc.Node.EventType.TOUCH_CANCEL || eventType === cc.Node.EventType.TOUCH_END) {
+          this.tileTest.onDrag(this.nodeToDrag.getComponent(DragableObject_1.default));
+        } else if (eventType === cc.Node.EventType.TOUCH_MOVE) this.onTouchMove(event); else if (eventType === cc.Node.EventType.TOUCH_CANCEL || eventType === cc.Node.EventType.TOUCH_END) {
           cc.log("\u96e2\u958b\u6293\u53d6\u6a21\u5f0f");
           this.node.setParent(this.defaultLayer);
           this.dragMode = false;
@@ -2462,6 +2556,7 @@ window.__require = function e(t, n, r) {
     exports.default = TouchArea;
     cc._RF.pop();
   }, {
+    "./Dirt": "Dirt",
     "./DragableObject": "DragableObject",
     "./TileTest": "TileTest",
     "./Vegetable": "Vegetable"
@@ -2940,14 +3035,13 @@ window.__require = function e(t, n, r) {
       __extends(Vegetable, _super);
       function Vegetable() {
         var _this = null !== _super && _super.apply(this, arguments) || this;
-        _this.label = null;
-        _this.text = "hello";
         _this.spriteFrames = [];
         _this.index = 0;
         _this.isFertilize = false;
+        _this.canHarvestflag = false;
         return _this;
       }
-      Vegetable.prototype.onSpawn = function(uid, nowTime, growTime, growthSteps) {
+      Vegetable.prototype.spawn = function(uid, nowTime, growTime, growthSteps) {
         this.uid = uid;
         this.nowTime = nowTime;
         this.growTime = growTime;
@@ -2955,6 +3049,7 @@ window.__require = function e(t, n, r) {
         cc.log("onSpawn:" + JSON.stringify(this.growthSteps));
         this.updateSprite();
         this.isFertilize = false;
+        this.canHarvestflag = false;
       };
       Vegetable.prototype.updateSprite = function() {
         var ratio = this.nowTime / this.growTime * 100;
@@ -2965,22 +3060,27 @@ window.__require = function e(t, n, r) {
       };
       Vegetable.prototype.randomTree = function() {};
       Vegetable.prototype.update = function(dt) {
-        this.nowTime < this.growTime && this.SpeedUp(dt);
+        this.canGrowing() && this.nowTime < this.growTime && this.SpeedUp(dt);
       };
       Vegetable.prototype.SpeedUp = function(addTime) {
         this.nowTime += addTime;
         this.nowTime > this.growTime && (this.nowTime = this.growTime);
         this.updateSprite();
+        if (this.nowTime >= this.growTime && false == this.canHarvestflag) {
+          this.canHarvestflag = true;
+          this.onCanHarvest && this.onCanHarvest(this);
+        }
       };
       Vegetable.prototype.enableFertilize = function(isEnable) {
         this.isFertilize = isEnable;
         this.fertilizeEffect.active = this.isFertilize;
       };
       Vegetable.prototype.canHarvest = function() {
-        return this.nowTime >= this.growTime;
+        return this.canHarvestflag;
       };
-      __decorate([ property(cc.Label) ], Vegetable.prototype, "label", void 0);
-      __decorate([ property ], Vegetable.prototype, "text", void 0);
+      Vegetable.prototype.harvest = function() {
+        this.canHarvestflag = false;
+      };
       __decorate([ property(cc.Sprite) ], Vegetable.prototype, "sprite", void 0);
       __decorate([ property([ cc.SpriteFrame ]) ], Vegetable.prototype, "spriteFrames", void 0);
       __decorate([ property(cc.Node) ], Vegetable.prototype, "fertilizeEffect", void 0);
