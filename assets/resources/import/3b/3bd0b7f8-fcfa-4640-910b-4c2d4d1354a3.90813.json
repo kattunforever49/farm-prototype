@@ -27,11 +27,13 @@
       {
         "items": [
           {
-            "uid": 0,
+            "uid": "0",
             "name": "绿豆",
             "iconSprite": "it_fa_00001",
+            "cost": 0,
             "tags": [
-              "seed"
+              "seed",
+              "farm"
             ],
             "growthSteps": [
               0,
@@ -41,9 +43,10 @@
             ]
           },
           {
-            "uid": 1,
-            "name": "椅子",
-            "iconSprite": "it_fa_00002",
+            "uid": "1",
+            "name": "椅子(藍)",
+            "iconSprite": "it_UI_0011",
+            "cost": 30,
             "tags": [
               "furniture"
             ],
@@ -55,8 +58,29 @@
             ]
           },
           {
-            "uid": 2,
-            "name": "加速槍"
+            "uid": "2",
+            "name": "加速槍",
+            "cost": 0
+          },
+          {
+            "uid": "3",
+            "name": "肥料",
+            "cost": 0
+          },
+          {
+            "uid": "4",
+            "name": "椅子(紅)",
+            "iconSprite": "it_UI_0012",
+            "cost": 100,
+            "tags": [
+              "furniture"
+            ],
+            "directionSprite": [
+              "it_fa_00002",
+              "it_fa_00002",
+              "it_fa_00002",
+              "it_fa_00002"
+            ]
           }
         ]
       }

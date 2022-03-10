@@ -952,6 +952,18 @@ window.__require = function e(t, n, r) {
         cc.log(uid + ", " + tag);
         return "seed" == tag && "0" == uid;
       };
+      ItemDatabase2.prototype.addPlayerItem = function(uid, count) {
+        var item = this.playerItems.find(function(x) {
+          return x.uid == uid;
+        });
+        item ? item.count = item.count + count : this.playerItems.push(new IItemDatabase_1.PlayerItemDataSet(uid, count));
+      };
+      ItemDatabase2.prototype.getPlayerItemCount = function(uid) {
+        var item = this.playerItems.find(function(x) {
+          return x.uid == uid;
+        });
+        return item ? item.count : 0;
+      };
       return ItemDatabase2;
     }();
     exports.ItemDatabase2 = ItemDatabase2;
@@ -1114,6 +1126,7 @@ window.__require = function e(t, n, r) {
     var PlayerData_1 = require("./PlayerData");
     var PlayerInfoPanel_1 = require("./PlayerInfoPanel");
     var SeedPanel_1 = require("./SeedPanel");
+    var ShopPanel_1 = require("./ShopPanel");
     var StoreItemData_1 = require("./StoreItemData");
     var StorePanel_1 = require("./StorePanel");
     var TestItemDb_1 = require("./TestItemDb");
@@ -1156,6 +1169,7 @@ window.__require = function e(t, n, r) {
               this.InitSeedPanel();
               this.InitTileTest();
               this.InitTouchArea();
+              this.InitShopPanel();
               cc.log("\u521d\u59cb\u5316\u5168\u90e8\u5b8c\u6210");
               this.blockUI.active = false;
               return [ 2 ];
@@ -1284,6 +1298,16 @@ window.__require = function e(t, n, r) {
       };
       Main.prototype.InitItemInfoData = function() {};
       Main.prototype.InitPlayerBuilding = function() {};
+      Main.prototype.InitShopPanel = function() {
+        this.shopPanel.inject(this.itemDb);
+        this.shopPanel.setItems([ {
+          uid: "0"
+        }, {
+          uid: "1"
+        }, {
+          uid: "4"
+        } ]);
+      };
       Main.prototype.onStoreButtonTrigger = function() {
         this.storeOpend = !this.storeOpend;
         if (this.storeOpend) {
@@ -1338,6 +1362,7 @@ window.__require = function e(t, n, r) {
       __decorate([ property(cc.Node) ], Main.prototype, "blockUI", void 0);
       __decorate([ property(cc.TiledMap) ], Main.prototype, "map", void 0);
       __decorate([ property(cc.Camera) ], Main.prototype, "gameCam", void 0);
+      __decorate([ property(ShopPanel_1.default) ], Main.prototype, "shopPanel", void 0);
       Main = __decorate([ ccclass ], Main);
       return Main;
     }(cc.Component);
@@ -1351,6 +1376,7 @@ window.__require = function e(t, n, r) {
     "./PlayerData": "PlayerData",
     "./PlayerInfoPanel": "PlayerInfoPanel",
     "./SeedPanel": "SeedPanel",
+    "./ShopPanel": "ShopPanel",
     "./StoreItemData": "StoreItemData",
     "./StorePanel": "StorePanel",
     "./TestItemDb": "TestItemDb",
@@ -1737,6 +1763,303 @@ window.__require = function e(t, n, r) {
     exports.default = Seed;
     cc._RF.pop();
   }, {} ],
+  ShopBuyCheckPanel: [ function(require, module, exports) {
+    "use strict";
+    cc._RF.push(module, "393f78CMrRKe6orZw8CXxpQ", "ShopBuyCheckPanel");
+    "use strict";
+    var __extends = this && this.__extends || function() {
+      var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || {
+          __proto__: []
+        } instanceof Array && function(d, b) {
+          d.__proto__ = b;
+        } || function(d, b) {
+          for (var p in b) Object.prototype.hasOwnProperty.call(b, p) && (d[p] = b[p]);
+        };
+        return extendStatics(d, b);
+      };
+      return function(d, b) {
+        extendStatics(d, b);
+        function __() {
+          this.constructor = d;
+        }
+        d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, new __());
+      };
+    }();
+    var __decorate = this && this.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : null === desc ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) r = Reflect.decorate(decorators, target, key, desc); else for (var i = decorators.length - 1; i >= 0; i--) (d = decorators[i]) && (r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r);
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports, "__esModule", {
+      value: true
+    });
+    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    var ShopBuyCheckPanel = function(_super) {
+      __extends(ShopBuyCheckPanel, _super);
+      function ShopBuyCheckPanel() {
+        var _this = null !== _super && _super.apply(this, arguments) || this;
+        _this.nameDisplayer = null;
+        _this.ownCountDisplayer = null;
+        _this.buyCountDisplayer = null;
+        _this.iconDisplayer = null;
+        _this.buyCount = 1;
+        return _this;
+      }
+      ShopBuyCheckPanel.prototype.inject = function(onBuy, onCancel) {
+        this.onBuy = onBuy;
+        this.onCancel = onCancel;
+      };
+      ShopBuyCheckPanel.prototype.setup = function(itemDb, uid) {
+        var _this = this;
+        var itemInfo = itemDb.getItemInfo(uid);
+        this.nameDisplayer.string = itemInfo["name"];
+        var playerItem = itemDb.playerItems.find(function(x) {
+          return x.uid == uid;
+        });
+        this.ownCountDisplayer.string = playerItem ? "\u76ee\u524d\u64c1\u6709\u6578\u91cf:" + playerItem.count.toString() : "\u76ee\u524d\u64c1\u6709\u6578\u91cf:0";
+        this.uid = uid;
+        this.buyCount = 1;
+        this.buyCountDisplayer.string = this.buyCount.toString();
+        itemDb.getIconSprite(uid).then(function(spriteFrame) {
+          _this.iconDisplayer.spriteFrame = spriteFrame;
+        });
+      };
+      ShopBuyCheckPanel.prototype.cancel = function() {
+        this.onCancel();
+      };
+      ShopBuyCheckPanel.prototype.buy = function() {
+        this.onBuy(this.uid, this.buyCount);
+      };
+      ShopBuyCheckPanel.prototype.increaseBuyCount = function() {
+        this.buyCount = this.buyCount + 1;
+        this.buyCount < 1 && (this.buyCount = 1);
+        this.buyCountDisplayer.string = this.buyCount.toString();
+      };
+      ShopBuyCheckPanel.prototype.decreaseBuyCount = function() {
+        this.buyCount = this.buyCount - 1;
+        this.buyCount < 1 && (this.buyCount = 1);
+        this.buyCountDisplayer.string = this.buyCount.toString();
+      };
+      __decorate([ property(cc.Label) ], ShopBuyCheckPanel.prototype, "nameDisplayer", void 0);
+      __decorate([ property(cc.Label) ], ShopBuyCheckPanel.prototype, "ownCountDisplayer", void 0);
+      __decorate([ property(cc.Label) ], ShopBuyCheckPanel.prototype, "buyCountDisplayer", void 0);
+      __decorate([ property(cc.Sprite) ], ShopBuyCheckPanel.prototype, "iconDisplayer", void 0);
+      ShopBuyCheckPanel = __decorate([ ccclass ], ShopBuyCheckPanel);
+      return ShopBuyCheckPanel;
+    }(cc.Component);
+    exports.default = ShopBuyCheckPanel;
+    cc._RF.pop();
+  }, {} ],
+  ShopItemUI: [ function(require, module, exports) {
+    "use strict";
+    cc._RF.push(module, "a42b1vr/PhPX628EOQaX2ga", "ShopItemUI");
+    "use strict";
+    var __extends = this && this.__extends || function() {
+      var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || {
+          __proto__: []
+        } instanceof Array && function(d, b) {
+          d.__proto__ = b;
+        } || function(d, b) {
+          for (var p in b) Object.prototype.hasOwnProperty.call(b, p) && (d[p] = b[p]);
+        };
+        return extendStatics(d, b);
+      };
+      return function(d, b) {
+        extendStatics(d, b);
+        function __() {
+          this.constructor = d;
+        }
+        d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, new __());
+      };
+    }();
+    var __decorate = this && this.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : null === desc ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) r = Reflect.decorate(decorators, target, key, desc); else for (var i = decorators.length - 1; i >= 0; i--) (d = decorators[i]) && (r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r);
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports, "__esModule", {
+      value: true
+    });
+    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    var ShopItemUI = function(_super) {
+      __extends(ShopItemUI, _super);
+      function ShopItemUI() {
+        var _this = null !== _super && _super.apply(this, arguments) || this;
+        _this.nameDisplayer = null;
+        return _this;
+      }
+      ShopItemUI.prototype.inject = function(showBuyCheckPanel) {
+        this.showBuyCheckPanel = showBuyCheckPanel;
+      };
+      ShopItemUI.prototype.setup = function(itemDb, uid) {
+        var _this = this;
+        this.uid = uid;
+        var itemInfo = itemDb.getItemInfo(uid);
+        this.nameDisplayer.string = itemInfo["name"];
+        this.costDisplayer.string = itemInfo["cost"].toString();
+        itemDb.getIconSprite(uid).then(function(spriteFrame) {
+          _this.itemIcon.spriteFrame = spriteFrame;
+        });
+      };
+      ShopItemUI.prototype.start = function() {
+        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
+      };
+      ShopItemUI.prototype.onTouchEnd = function(event) {
+        this.showBuyCheckPanel(this.uid);
+      };
+      __decorate([ property(cc.Label) ], ShopItemUI.prototype, "nameDisplayer", void 0);
+      __decorate([ property(cc.Sprite) ], ShopItemUI.prototype, "itemIcon", void 0);
+      __decorate([ property(cc.Sprite) ], ShopItemUI.prototype, "currencyIcon", void 0);
+      __decorate([ property(cc.RichText) ], ShopItemUI.prototype, "costDisplayer", void 0);
+      ShopItemUI = __decorate([ ccclass ], ShopItemUI);
+      return ShopItemUI;
+    }(cc.Component);
+    exports.default = ShopItemUI;
+    cc._RF.pop();
+  }, {} ],
+  ShopPanel: [ function(require, module, exports) {
+    "use strict";
+    cc._RF.push(module, "b5494Dk52FIap25mFb3doZB", "ShopPanel");
+    "use strict";
+    var __extends = this && this.__extends || function() {
+      var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || {
+          __proto__: []
+        } instanceof Array && function(d, b) {
+          d.__proto__ = b;
+        } || function(d, b) {
+          for (var p in b) Object.prototype.hasOwnProperty.call(b, p) && (d[p] = b[p]);
+        };
+        return extendStatics(d, b);
+      };
+      return function(d, b) {
+        extendStatics(d, b);
+        function __() {
+          this.constructor = d;
+        }
+        d.prototype = null === b ? Object.create(b) : (__.prototype = b.prototype, new __());
+      };
+    }();
+    var __decorate = this && this.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : null === desc ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if ("object" === typeof Reflect && "function" === typeof Reflect.decorate) r = Reflect.decorate(decorators, target, key, desc); else for (var i = decorators.length - 1; i >= 0; i--) (d = decorators[i]) && (r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r);
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports, "__esModule", {
+      value: true
+    });
+    var ShopBuyCheckPanel_1 = require("./ShopBuyCheckPanel");
+    var ShopItemUI_1 = require("./ShopItemUI");
+    var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+    var ShopPanel = function(_super) {
+      __extends(ShopPanel, _super);
+      function ShopPanel() {
+        var _this = null !== _super && _super.apply(this, arguments) || this;
+        _this.tabSprites = [];
+        _this.lastIndex = -1;
+        _this.itemNodes = [];
+        return _this;
+      }
+      ShopPanel.prototype.inject = function(itemDb) {
+        var _this = this;
+        this.itemDb = itemDb;
+        this.shopBuyCheckPanel.inject(function(uid, count) {
+          return _this.onBuy(uid, count);
+        }, function() {
+          return _this.onCancel();
+        });
+      };
+      ShopPanel.prototype.setItems = function(itemInfos) {
+        this.itemInfos = itemInfos;
+      };
+      ShopPanel.prototype.open = function() {
+        this.lastIndex = -1;
+        this._tabClick(2);
+        this.node.active = true;
+      };
+      ShopPanel.prototype.close = function() {
+        this.node.active = false;
+      };
+      ShopPanel.prototype.tabClick = function(event, customEventData) {
+        this._tabClick(customEventData);
+      };
+      ShopPanel.prototype._tabClick = function(index) {
+        var _this = this;
+        cc.log("tabClick:" + index);
+        if (this.lastIndex == index) return;
+        this.lastIndex = index;
+        var filterInfos = this.itemInfos;
+        if (0 != index) {
+          var tag = "";
+          1 == index ? tag = "farm" : 2 == index ? tag = "furniture" : 3 == index && (tag = "timelimit");
+          filterInfos = this.itemInfos.filter(function(itemInfo) {
+            var _itemInfo = _this.itemDb.getItemInfo(itemInfo["uid"]);
+            if (!_itemInfo) {
+              cc.log("\u6c92\u6709\u8cc7\u6599");
+              throw "\u6c92\u6709\u5efa\u7acb\u9053\u5177\u8cc7\u6599:" + itemInfo["uid"];
+            }
+            cc.log(JSON.stringify(_itemInfo));
+            if (_itemInfo["tags"] && _itemInfo["tags"].includes(tag)) {
+              _itemInfo["tags"] && cc.log("\u6709\u6a19\u7c64\u6b04\u4f4d");
+              return true;
+            }
+            return false;
+          });
+        }
+        cc.log("\u7269\u54c1\u8cc7\u6599:" + JSON.stringify(this.itemInfos[0]["uid"]));
+        cc.log("\u904e\u6ffe\u7269\u54c1\u6578\u91cf:" + filterInfos.length);
+        if (filterInfos.length > this.itemNodes.length) {
+          var diff = filterInfos.length - this.itemNodes.length;
+          for (var i = 0; i < diff; i++) {
+            var inst = cc.instantiate(this.itemPrefab);
+            inst.setParent(this.itemsRoot);
+            var shopItemUI = inst.getComponent(ShopItemUI_1.default);
+            shopItemUI.inject(function(uid) {
+              return _this.ShowBuyCheckPanel(uid);
+            });
+            this.itemNodes.push(shopItemUI);
+          }
+        }
+        for (var i = 0; i < this.itemNodes.length; i++) if (i >= filterInfos.length) this.itemNodes[i].node.active = false; else {
+          var itemInfo = filterInfos[i];
+          this.itemNodes[i].setup(this.itemDb, itemInfo["uid"]);
+          this.itemNodes[i].node.active = true;
+        }
+      };
+      ShopPanel.prototype.ShowBuyCheckPanel = function(uid) {
+        this.shopBuyCheckPanel.setup(this.itemDb, uid);
+        this.shopBuyCheckPanel.node.active = true;
+        this.blackBlockIO.active = true;
+      };
+      ShopPanel.prototype.onBuy = function(uid, count) {
+        cc.log("Buy:" + uid + ", count:" + count);
+        this.shopBuyCheckPanel.node.active = false;
+        this.blackBlockIO.active = false;
+        cc.log(this.itemDb.getPlayerItemCount(uid));
+        this.itemDb.addPlayerItem(uid, count);
+        cc.log(this.itemDb.getPlayerItemCount(uid));
+      };
+      ShopPanel.prototype.onCancel = function() {
+        cc.log("Cancel buy");
+        this.shopBuyCheckPanel.node.active = false;
+        this.blackBlockIO.active = false;
+      };
+      __decorate([ property([ cc.Sprite ]) ], ShopPanel.prototype, "tabSprites", void 0);
+      __decorate([ property(cc.Prefab) ], ShopPanel.prototype, "itemPrefab", void 0);
+      __decorate([ property(cc.Node) ], ShopPanel.prototype, "itemsRoot", void 0);
+      __decorate([ property(ShopBuyCheckPanel_1.default) ], ShopPanel.prototype, "shopBuyCheckPanel", void 0);
+      __decorate([ property(cc.Node) ], ShopPanel.prototype, "blackBlockIO", void 0);
+      ShopPanel = __decorate([ ccclass ], ShopPanel);
+      return ShopPanel;
+    }(cc.Component);
+    exports.default = ShopPanel;
+    cc._RF.pop();
+  }, {
+    "./ShopBuyCheckPanel": "ShopBuyCheckPanel",
+    "./ShopItemUI": "ShopItemUI"
+  } ],
   Singleton: [ function(require, module, exports) {
     "use strict";
     cc._RF.push(module, "38466Uyn+5Gm64vaCIiiVbz", "Singleton");
@@ -3090,4 +3413,4 @@ window.__require = function e(t, n, r) {
     exports.default = Vegetable;
     cc._RF.pop();
   }, {} ]
-}, {}, [ "BackpackItemSlot", "BottomDragPanel", "ButtonAnimation", "CameraController", "Dirt", "DragableObject", "EventNode", "Extentions", "GrowingTimeDisplayer", "IDragHandler", "IItemDatabase", "ItemDatabase2", "Main", "Map", "ObserverPattern", "PlayerData", "PlayerInfoPanel", "Seed", "SeedPanel", "SeedPanelSlot", "Singleton", "StoreItemBuyPanel", "StoreItemData", "StoreItemSlot", "StorePanel", "TestItemDb", "TestTileMap", "TileTest", "TouchArea", "TouchDebug", "TouchEvent", "TouchManager", "TouchSystem", "Touchable", "TouchableGroup", "UIButton", "UIController", "Vegetable" ]);
+}, {}, [ "BackpackItemSlot", "BottomDragPanel", "ButtonAnimation", "CameraController", "Dirt", "DragableObject", "EventNode", "Extentions", "GrowingTimeDisplayer", "IDragHandler", "IItemDatabase", "ItemDatabase2", "Main", "Map", "ObserverPattern", "PlayerData", "PlayerInfoPanel", "Seed", "SeedPanel", "SeedPanelSlot", "ShopBuyCheckPanel", "ShopItemUI", "ShopPanel", "Singleton", "StoreItemBuyPanel", "StoreItemData", "StoreItemSlot", "StorePanel", "TestItemDb", "TestTileMap", "TileTest", "TouchArea", "TouchDebug", "TouchEvent", "TouchManager", "TouchSystem", "Touchable", "TouchableGroup", "UIButton", "UIController", "Vegetable" ]);
